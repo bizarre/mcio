@@ -13,11 +13,9 @@ pub fn ping<A: Into<String>>(address: A, port: u16, protocol_version: i32) {
 
     let mut stream = TcpStream::connect(format!("{}:{}", address, port)).unwrap();
 
-    stream.write_packet(Packet::Handshake(protocol_version, address, port)).unwrap();
-    stream.write_packet(Packet::Request).unwrap();
-    stream.write_packet(Packet::Ping).unwrap();
-
-    
+    stream.write_packet(packet::Handshake::new(protocol_version, address, port)).unwrap();
+    stream.write_packet(packet::Request::new()).unwrap();
+    stream.write_packet(packet::Ping::new()).unwrap();
 }
 
 #[cfg(test)]
@@ -32,11 +30,11 @@ mod tests {
     #[test]
     fn handshake() -> Result<()> {
         let mut stream = TcpStream::connect("localhost:25577")?;
-        let packet = Packet::Handshake(335, "localhost".to_owned(), 25577);
+        let packet = packet::Handshake::new(335, "localhost", 25577);
 
         stream.write_packet(packet)?;
-        stream.write_packet(Packet::Request)?;
-        stream.write_packet(Packet::Ping)?;
+        stream.write_packet(packet::Request::new())?;
+        stream.write_packet(packet::Ping::new())?;
 
         Ok(())
     }

@@ -1,17 +1,18 @@
 use std::io::{ Read, Write, Result };
-use crate::packet::Packet;
+use crate::packet::{ Packet, Out, In };
 
 pub trait MinecraftWrite {
     fn write_varint(&mut self, value: i32) -> Result<()>;
     fn write_long(&mut self, value: i64) -> Result<()>;
     fn write_string(&mut self, value: String) -> Result<()>;
     fn write_u16(&mut self, value: u16) -> Result<()>;
-    fn write_packet(&mut self, packet: Packet) -> Result<()>;
+    fn write_packet<T: Packet + Out>(&mut self, packet: T) -> Result<()>;
 }
 
 pub trait MinecraftRead {
     fn read_varint(&mut self) -> Result<i32>;
     fn read_string(&mut self) -> Result<String>;
+    fn receive<T: Packet + In>(&mut self) -> Result<()>;
 }
 
 impl<W: Write> MinecraftWrite for W {
@@ -59,7 +60,7 @@ impl<W: Write> MinecraftWrite for W {
         Ok(())
     }
 
-    fn write_packet(&mut self, packet: Packet) -> Result<()> {
+    fn write_packet<T: Packet + Out>(&mut self, packet: T) -> Result<()> {
         let mut buffer = Vec::new();
         let mut payload = Vec::new();
 
@@ -82,5 +83,9 @@ impl<R: Read> MinecraftRead for R {
 
     fn read_string(&mut self) -> Result<String> {
         Ok("".to_owned())
+    }
+
+    fn receive<T: Packet + In>(&mut self) -> Result<()> {
+        Ok(())
     }
 }

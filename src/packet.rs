@@ -1,52 +1,80 @@
 use crate::io::{ MinecraftWrite };
-use std::io::{ Result };
+use std::io::{ Result, Write, Read };
 
-/// A minecraft protocol packet
-pub enum Packet {
-    /// The handshake packet as described in <https://wiki.vg/Protocol#Handshaking>
-    /// 
-    /// # Arguments (in order)
-    ///
-    /// * `i32`      (version) Protocol version
-    /// * `String`   (address) Hostname or IP, e.g. localhost or 127.0.0.1, that was used to connect
-    /// * `u16`      (port) Default for a server is 25565. The Notchian server does not use this information
-    /// * `i32`      (state) 1 for status, 2 for login
-    Handshake(i32, String, u16),
-
-    /// The request packet as described in <https://wiki.vg/Server_List_Ping#Request>
-    Request,
-
-    /// The ping packet as described in <https://wiki.vg/Server_List_Ping#Ping>
-    Ping
+/// Represents a minecraft protocol packet
+pub trait Packet {
+    fn get_id(&self) -> i32;
 }
 
-impl Packet {
-    pub fn get_id(&self) -> i32 {
-        match self {
-            &Packet::Handshake(_, _, _) => 0x00,
-            &Packet::Request => 0x00,
-            &Packet::Ping => 0x01
+/// Represents a packet originating from the client (mcio) and bound for the server
+pub trait Out : Packet {
+    fn write<W: MinecraftWrite>(self, buffer: &mut W) -> Result<()>;
+}
+
+/// Represents a packet originating from the server and bound for the client (mcio)
+pub trait In : Packet {
+    
+}
+
+
+pub struct Handshake {
+    version: i32,
+    address: String,
+    port: u16
+}
+
+impl Handshake {
+    pub fn new<A: Into<String>>(version: i32, address: A, port: u16) -> Handshake {
+        Handshake {
+            version: version,
+            address: address.into(),
+            port: port
         }
     }
+}
 
-    pub fn write<W: MinecraftWrite>(self, buffer: &mut W) -> Result<()> {
-        match self {
-            Packet::Handshake(version, address, port) => {
-                buffer.write_varint(version)?;
-                buffer.write_string(address)?;
-                buffer.write_u16(port)?;
-                buffer.write_varint(1)?;
+impl Packet for Handshake {
+    fn get_id(&self) -> i32 { 0x00 }
+}
 
-                Ok(())
-            },
+impl Out for Handshake {
+    fn write<W: MinecraftWrite>(self, buffer: &mut W) -> Result<()> {
+        buffer.write_varint(self.version)?;
+        buffer.write_string(self.address)?;
+        buffer.write_u16(self.port)?;
+        buffer.write_varint(1)?;
 
-            Packet::Request => Ok(()),
+        Ok(())
+    }
+}
 
-            Packet::Ping => {
-                buffer.write_long(-1)?;
 
-                Ok(())
-            }
-        }
+pub struct Request;
+impl Request {
+    pub fn new() -> Request { Request { } }
+}
+
+impl Packet for Request {
+    fn get_id(&self) -> i32 { 0x00 }
+}
+
+impl Out for Request {
+    fn write<W: MinecraftWrite>(self, _: &mut W) -> Result<()> { Ok(()) }
+}
+
+
+pub struct Ping;
+impl Ping {
+    pub fn new() -> Ping { Ping { } }
+}
+
+impl Packet for Ping {
+    fn get_id(&self) -> i32 { 0x01 }
+}
+
+impl Out for Ping {
+    fn write<W: MinecraftWrite>(self, buffer: &mut W) -> Result<()> {
+        buffer.write_long(-1)?;
+        Ok(()) 
     }
 }
