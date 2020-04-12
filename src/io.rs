@@ -116,15 +116,20 @@ impl<R: Read> MinecraftRead for R {
     }
 
     fn receive<T: Packet + In>(&mut self) -> Result<Option<T>> {
+        let mut time = 0;
+
         loop {
             let packet = T::read(self)?;
             if packet.is_some() {
                 return Ok(Some(packet.unwrap()));
             }
 
+            time += 1;
             thread::sleep(Duration::new(1, 0));
-        }
 
-        Ok(None)
+            if time > 3 {
+                panic!("Request timed out.");
+            }
+        }
     }
 }

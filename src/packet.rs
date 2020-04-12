@@ -118,7 +118,7 @@ impl In for Response {
         let _ = buffer.read_varint()?; //todo: maybe offload this kind of logic to calling function
         let id = buffer.read_varint()?;
 
-        assert_eq!(0x00, id);
+        assert_eq!(0x00, id, "Invalid packet ID. Probably not a Minecraft server.");
 
         let size = buffer.read_varint()?;
         let mut json_buffer = vec![0; size as usize];
