@@ -1,7 +1,11 @@
 #![crate_name = "mcio"]
+#![feature(external_doc)]
+#![doc(include = "../README.md")]
 
 /// Minecraft packets
 pub mod packet;
+
+/// Internal IO utilities
 pub mod io;
 
 use std::net::TcpStream;

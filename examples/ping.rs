@@ -1,8 +1,6 @@
 use std::env;
 
 use std::io::{ Result };
-use std::net::TcpStream;
-use mcio::io::{ MinecraftWrite };
 
 fn main() -> Result<()> {
     let args = env::args().collect::<Vec<String>>();
@@ -14,7 +12,7 @@ fn main() -> Result<()> {
 
     let response = mcio::ping(address, port, 315).expect("Failed to get response.");
 
-    println!("json: {}", response.json);
+    println!("{}", response.json);
 
     Ok(())
 }
