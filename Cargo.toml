@@ -3,6 +3,7 @@ name = "mcio"
 version = "0.1.1"
 authors = ["Alex A. <alex@tsanga.net>"]
 edition = "2018"
+description = "minecraft server list ping library"
 repository = "https://www.github.com/bizarre/mcio"
 readme = "README.md"
 license = "MIT"
