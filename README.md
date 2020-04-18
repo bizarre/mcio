@@ -15,19 +15,7 @@ As of right now, all calls to `mcio` are blocking.
 fn main() {
     let response = mcio::ping("mc.hypixel.net", 25565, 315).expect("Failed to get response.");
 
-    println!("{}", response.json);
-    /* response.json (pretty):
-        {"version":{
-            "name":"Requires MC 1.8-1.15",
-            "protocol":315
-        },
-        "players":{
-            "max":85000,
-            "online":62822,
-            "sample":[]
-        },
-        "description":"§aHypixel Network  §c[1.8-1.15]\n§b§lEASTER EVENT §7- §6§lTRIPLE COINS + EXP",
-        "favicon":"data:image/png;base64..."}
-    */
+    println!("Players: {}/{}", response.players.online, response.players.max);
+    /* Players: 62075/85000 */
 }
 ```
