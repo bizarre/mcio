@@ -118,7 +118,7 @@ pub struct Response {
 pub struct ServerPlayers {
     pub max: i32,
     pub online: i32,
-    pub sample: Vec<ServerPlayer>
+    pub sample: Option<Vec<ServerPlayer>>
 }
 
 #[derive(Deserialize, Debug)]
