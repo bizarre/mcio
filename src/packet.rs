@@ -116,15 +116,15 @@ pub struct Response {
 
 #[derive(Deserialize, Debug)]
 pub struct ServerPlayers {
-    max: i32,
-    online: i32,
-    sample: Vec<ServerPlayer>
+    pub max: i32,
+    pub online: i32,
+    pub sample: Vec<ServerPlayer>
 }
 
 #[derive(Deserialize, Debug)]
 pub struct ServerPlayer {
-    name: String,
-    id: String
+    pub name: String,
+    pub id: String
 }
 
 #[derive(Deserialize, Debug)]
