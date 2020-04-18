@@ -12,7 +12,7 @@ fn main() -> Result<()> {
 
     let response = mcio::ping(address, port, 315).expect("Failed to get response.");
 
-    println!("{}", response.json);
+    println!("{:?}", response);
 
     Ok(())
 }

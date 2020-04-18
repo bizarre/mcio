@@ -1,5 +1,7 @@
 use crate::io::{ MinecraftWrite, MinecraftRead };
 use std::io::{ Result };
+use serde::Deserialize;
+
 
 /// Represents a Minecraft packet
 pub trait Packet {
@@ -19,7 +21,7 @@ pub trait In : Packet {
 
 /// The handshake packet as described in <https://wiki.vg/Protocol#Handshaking> (*)
 /// 
-/// # Arguments (in order)
+/// # Fields
 ///
 /// * `version`  Protocol version
 /// * `address`  Hostname or IP, e.g. localhost or 127.0.0.1, that was used to connect
@@ -105,8 +107,30 @@ impl Out for Ping {
     }
 }
 
+#[derive(Deserialize, Debug)]
 pub struct Response {
-    pub json: String
+    pub version: ServerVersion,
+    pub players: ServerPlayers,
+    pub favicon: String
+}
+
+#[derive(Deserialize, Debug)]
+pub struct ServerPlayers {
+    max: i32,
+    online: i32,
+    sample: Vec<ServerPlayer>
+}
+
+#[derive(Deserialize, Debug)]
+pub struct ServerPlayer {
+    name: String,
+    id: String
+}
+
+#[derive(Deserialize, Debug)]
+pub struct ServerVersion {
+    pub name: String,
+    pub protocol: u16
 }
 
 impl Packet for Response {
@@ -131,8 +155,6 @@ impl In for Response {
             return Ok(None);
         }
 
-        Ok(Some(Response {
-            json: json
-        }))
+        Ok(Some(serde_json::from_str(&json).unwrap()))
     }
 }
