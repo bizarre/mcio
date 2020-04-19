@@ -1,6 +1,6 @@
 [package]
 name = "mcio"
-version = "0.3.0"
+version = "0.3.1"
 authors = ["Alex A. <alex@tsanga.net>"]
 edition = "2018"
 description = "minecraft server list ping library"
@@ -14,3 +14,4 @@ keywords = ["minecraft", "protocol", "api"]
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
+trust-dns-resolver = "^0.9"

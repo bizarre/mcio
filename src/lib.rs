@@ -11,9 +11,25 @@ pub mod io;
 use std::net::{ToSocketAddrs, TcpStream};
 use io::{ MinecraftWrite, MinecraftRead };
 use std::time::Duration;
+use trust_dns_resolver::{Resolver, Name};
+use trust_dns_resolver::config::*;
 
 pub fn ping<A: Into<String>>(address: A, port: u16, protocol_version: i32) -> Option<packet::Response> {
     let address = address.into();
+
+    let resolver = Resolver::new(ResolverConfig::default(), ResolverOpts::default()).unwrap();
+    let lookup = resolver.lookup_srv(&["_minecraft._tcp.", &address].concat());
+    
+    let address = if lookup.is_ok() {
+        let response = lookup.unwrap();
+        let record = response.iter().next().unwrap();
+
+        let ip = record.target().to_string().trim_matches('.').to_string();
+
+        record.target().to_string().trim_matches('.').to_string()
+    } else {
+        address.to_owned()
+    };
 
     if let Ok(mut stream) = TcpStream::connect_timeout(
             &format!("{}:{}", address, port).to_socket_addrs().unwrap().next().unwrap(),
